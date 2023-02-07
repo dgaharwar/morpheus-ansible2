@@ -3,10 +3,10 @@
   gather_facts: true
   tasks:
     - debug:
-        #morpheus: "{{ morpheus }}"
-        #msg: "{{ morpheus['morpheus'] }}"
-        #msg: "{{ morpheus['accountNumber'] }}"
+        morpheus: "{{ morpheus }}"
+        msg: "{{ morpheus['morpheus'] }}"
+        msg: "{{ morpheus['accountNumber'] }}"
         msg: "{{ morpheus['cloudCode'] }}"
-        #msg: "{{ morpheus['user']['linuxUsername'] }}"
-        #msg: "{{ morpheus['instance']['container']['server']['internalIp'] }}"
-        #msg: "{{ morpheus['morpheus']['container']['server']['osType'] }}"
+        msg: "{{ morpheus['user']['linuxUsername'] }}"
+        msg: "{{ morpheus['instance']['container']['server']['internalIp'] }}"
+        msg: "{{ morpheus['morpheus']['container']['server']['osType'] }}"
