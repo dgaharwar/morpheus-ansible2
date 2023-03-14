@@ -9,5 +9,5 @@
         msg: "{{ morpheus['cloudCode'] }}"
         msg: "{{ morpheus['user']['linuxUsername'] }}"
         #msg: "{{ morpheus['instance']['container']['server']['internalIp'] }}"
-        #msg: "{{ morpheus['morpheus']['container']['server']['osType'] }}"
-        msg: "{{ morpheus['morpheus']['container']['server']['cloudCode'] }}"
+        #msg: "{{ morpheus['instance']['container']['server']['osType'] }}"
+        msg: "{{ morpheus['instance']['container']['server']['cloudCode'] }}"
