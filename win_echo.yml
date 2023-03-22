@@ -4,8 +4,8 @@
   hosts: all
   gather_facts: true
   become: true
-  become_method: runas
-  #become_user: runas
+  #become_method: runas
+  become_user: runas
   tasks:
     - win_shell: echo "Hello World"
       register: output
