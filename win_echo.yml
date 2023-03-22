@@ -1,0 +1,13 @@
+
+---
+- name: Echo Hello World
+  hosts: all
+  gather_facts: true
+  become: true
+  become_user: runas
+  tasks:
+    - win_shell: echo "Hello World"
+      register: output
+    - debug:
+        var: output
+        
