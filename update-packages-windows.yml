@@ -1,0 +1,25 @@
+---
+# Windows
+- name: Set PowerShell execution policy
+  ansible.builtin.raw: powershell.exe -ExecutionPolicy RemoteSigned -Command { Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force }
+
+- name: Install all security, critical, and rollup updates
+  win_updates:
+    category_names:
+      - SecurityUpdates
+      - CriticalUpdates
+      - UpdateRollups
+    server_selection: "windows_update"
+    reboot: yes
+    log_path: C:\Windows\Temp\ansible_wu.txt
+    reboot_timeout: 3600
+  register: update_status
+  until: update_status.failed == false
+
+- name: Display the results from the patching
+  ansible.builtin.debug:
+    var: update_status
+
+- name: Reboot the system post patching to make sure everything comes up clean
+  ansible.windows.win_reboot:
+    reboot_timeout: 3600
