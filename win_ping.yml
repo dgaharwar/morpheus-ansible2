@@ -1,8 +1,10 @@
-    ---
-    - hosts: all
-      gather_facts: true
-      become: true
-      become_user: runas
-      tasks:
-        - name: Windows Ping
-          win_ping:
+---
+- name: Ansible Windows Ping Playbook
+  hosts: all
+  gather_facts: true
+  become: true
+  become_user: runas
+  tasks:
+   - name: Windows Ping
+     win_ping:
+     data: "Hello from Ansible!"
