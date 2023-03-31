@@ -1,0 +1,3 @@
+---
+- name: Morpheus Initiele config
+  hosts: morpheus_fe morpheusfe
