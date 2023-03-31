@@ -1,10 +1,10 @@
+
 ---
 - name: Morpheus Initiele config
-- hosts: morpheus_fe morpheusfe
+  hosts: morpheus_fe morpheusfe
   become: yes
   become_method: sudo
   gather_facts: yes
-
   tasks:
     - yum: "name={{ item }} state=present"
       with_items:
