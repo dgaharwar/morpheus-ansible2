@@ -1,5 +1,7 @@
 ---
-- hosts: morpheusfe morpheus_fe
+- hosts:
+  - morpheusfe
+  - morpheus_fe
   gather_facts: true
 
   tasks:
