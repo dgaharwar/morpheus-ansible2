@@ -1,0 +1,15 @@
+---
+- hosts:
+  - morpheusfe
+  - morpheus_fe
+  gather_facts: true
+  become: true
+  tasks:
+  - name: Install package
+    yum:
+      name: httpd
+      state: present
+  - name: ensure apache is running
+    service:
+      name: httpd 
+      state: started
