@@ -1,0 +1,10 @@
+---
+
+- name: Install Apache
+  hosts: all
+  become: true
+  tasks:
+    - name: Install Apache
+      package:
+        name: httpd
+        state: latest
