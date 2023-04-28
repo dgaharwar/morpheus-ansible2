@@ -2,7 +2,7 @@
 - name: Ansible Windows Ping Playbook
   hosts: all
   gather_facts: true
-  become: false
+  become: true
   become_user: Administrator
   tasks:
    - name: Windows Ping
