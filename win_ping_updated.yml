@@ -3,7 +3,7 @@
   hosts: all
   gather_facts: true
   become: false
-  become_user: runas
+  become_user: Administrator
   tasks:
    - name: Windows Ping
      win_ping:
