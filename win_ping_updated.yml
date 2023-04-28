@@ -3,7 +3,7 @@
   hosts: all
   gather_facts: true
   become: true
-  become_user: Administrator
+  become_user: deepti
   tasks:
    - name: Windows Ping
      win_ping:
