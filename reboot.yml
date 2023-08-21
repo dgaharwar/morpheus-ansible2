@@ -12,6 +12,6 @@
       #      reboot_timeout: 300
       #      test_command: hostname
      
-        - name: Output message
-          debug:
-            msg: "Next task"
+        #- name: Output message
+        #  debug:
+        #    msg: "Next task"
