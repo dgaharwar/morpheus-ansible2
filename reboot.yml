@@ -2,11 +2,11 @@
 - hosts: all
     
   tasks:
-    - name: Gather system facts
-      setup:
-      vars:
-        ansible_python_interpreter: /usr/bin/python3
-        
+    # - name: Gather system facts
+    #   setup:
+    #   vars:
+    #     ansible_python_interpreter: /usr/bin/python3
+
     - name: Disable cloud-init
       ansible.builtin.file:
         path: /etc/cloud/cloud-init.disabled
