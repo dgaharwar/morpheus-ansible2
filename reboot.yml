@@ -7,10 +7,10 @@
     #   vars:
     #     ansible_python_interpreter: /usr/bin/python3
 
-    # - name: Disable cloud-init
-    #   ansible.builtin.file:
-    #     path: /etc/cloud/cloud-init.disabled
-    #     state: touch
+    - name: Disable cloud-init
+      ansible.builtin.file:
+        path: /etc/cloud/cloud-init.disabled
+        state: touch
      
     - name: Reboot node and wait for it to restart
       ansible.builtin.reboot:
