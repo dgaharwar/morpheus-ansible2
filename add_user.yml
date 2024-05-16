@@ -7,7 +7,7 @@
   become_method: sudo
   tasks:
   - set_fact:
-      userpass: "{{ lookup('cypher','secret=secret/userpass') }}"
+      userpass: "Password123?"
 
   - name: Add a user
     user:
