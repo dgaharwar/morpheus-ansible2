@@ -16,7 +16,7 @@
       state: present
   
   - debug:
-        msg: "{{ lookup('cypher','secret=secret/userpass') }}"
+        msg: "Password123?"
 
   - name: Make sure we have a 'wheel' group
     group:
