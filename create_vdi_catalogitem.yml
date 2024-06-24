@@ -1,0 +1,33 @@
+---
+pb_cmp_ssr_catalogitem_input:
+  - name: "{{ pb_cmp_ssr_morpheus_vdi_catalog_prefix | default('Morpheus') }} VDI Pool"
+    description: Catalog item to provision Morpheus VDI Pool.
+    type: workflow
+    enabled: true
+    featured: true
+    content: |
+      # __VDI Description:__
+      Virtual Desktop Infrastructure as a Service is a software technology that separates the desktop environment and associated application software from the physical client device that is used to access it. VDI allow users access to virtual desktops with different parts of the infrastructure, depending on the chosen options in the service request.
+
+      # __VDI in ARC:__
+      Currently in ARC we offer through the service catalog the Operator VDI, a.k.a. Morpheus VDI. This VDI is intended to be used as a simple day to day jumphost, giving Tenant Owner and Operator an easy way to consume their Tenant resources. It should be considered as a slim version VDI and does not support GPU/3D acceleration or low latency applications.
+
+      # __SLA information:__
+      ARC Team is responsible up to the Hypervisor Level (ensuring that Infrastructure and Management Services are within SLA)
+      Customer is responsible for Operating System and everything running on it (this includes all maintenance such as updates or patches)
+
+      # __More information:__
+      All details how to request the VDI in ARC can be found in the Wiki page [here](/operations/wiki/3.%20Self%20Service%20Requests/operator-vdi)
+
+    logo: "/artifactory/generic-local/arc-services/morpheus_vdi/logos/vdi.png"
+    darkLogo: "/artifactory/generic-local/arc-services/morpheus_vdi/logos/vdi_dark.png"
+    visibility: public
+    workflow:
+      id: (prefix)run_vdi_pool_workflow
+    context: appliance
+
+pb_cmp_ssr_role_catalogitem_access_input:
+  - rolename: "{{ pb_cmp_ssr_role_private_customer_tenant_role }}"
+    permission:
+      - access: full
+        catalogItemTypeId: "{{ pb_cmp_ssr_morpheus_vdi_catalog_prefix | default('Morpheus') }} VDI Pool"
