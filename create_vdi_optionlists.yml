@@ -1,0 +1,385 @@
+---
+pb_cmp_ssr_optionlist_input:
+  - name: (prefix)actionListCD
+    description: Action List CD
+    type: manual
+    visibility: public
+    initialDataset: '[{ "name": "Create", "value": "Create" }, { "name": "Update", "value": "Update" }, { "name": "Delete", "value": "Delete" }]'
+
+  - name: (prefix)vdiPoolSizeList
+    description: vdiPoolSizeList
+    type: manual
+    visibility: public
+    initialDataset: '[{ "name": "Small", "value": "Small" }, { "name": "Medium", "value": "Medium" }, { "name": "Large", "value": "Large" }, { "name": "Custom", "value": "Custom" }]'
+
+  - name: (prefix)vdiCloudsList
+    description: Clouds
+    type: api
+    visibility: public
+    apiType: clouds
+    translationScript: |
+      for(var x = 0; x < data.length; x++){
+      results.push({ "name": data[x].name, "value": data[x].value + ';' + data[x].name});}
+
+  - name: (prefix)vdiGroupsList
+    description: VDI Groups List
+    type: api
+    visibility: public
+    apiType: groups
+    translationScript: |
+      if(input.vdiSelectedCloud){
+      var filltered_data = [];
+      function fillter_data(tier){
+          for(var i = 0; i < data.length; i++){
+              if (data[i].name.toLowerCase().includes(tier.toLowerCase())){
+                  filltered_data.push(data[i]);
+              }}
+      return filltered_data;
+      };
+      function push_results(filltered_data){
+          for(var x = 0; x < filltered_data.length; x++){
+              results.push({ "name": filltered_data[x].name, "value": filltered_data[x].value + ';' + filltered_data[x].name});}
+      };
+      if(fillter_data("silver").length > 0){push_results(filltered_data)}
+      else if(fillter_data("gold").length > 0){push_results(filltered_data)}
+      else if(fillter_data("platinum").length > 0){push_results(filltered_data)}
+      };
+    requestScript: |
+      if(input.vdiSelectedCloud){
+      results.zoneId = input.vdiSelectedCloud.split(';')[0];}
+
+  - name: (prefix)vdiPlanList
+    description: Service Plans
+    type: api
+    visibility: public
+    apiType: servicePlans
+    translationScript: |
+      if(input.vdiSelectedCloud && input.vdiSelectedGroup){
+      var filltered_data = [];
+      function fillter_data(tier){
+          for(var i = 0; i < data.length; i++){
+              if (data[i].code.startsWith('(prefix)') && data[i].name.toLowerCase().includes(tier.toLowerCase())){
+                  filltered_data.push(data[i]);
+              }}
+      return filltered_data;
+      };
+      function push_results(filltered_data){
+          for(var x = 0; x < filltered_data.length; x++){
+              results.push({ "name": filltered_data[x].name, "value": filltered_data[x].value + ';' + filltered_data[x].name});}
+      };
+      if(fillter_data(input.vdiSelectedGroup.split("_").pop()).length > 0){push_results(filltered_data)}
+      };
+    requestScript: |
+      if(input.vdiSelectedCloud && input.vdiSelectedGroup){
+      results.zoneId = input.vdiSelectedCloud.split(';')[0];
+      results.siteId = input.vdiSelectedGroup.split(';')[0];}
+
+  - name: (prefix)vdiPoolList
+    description: VDI Pool List
+    type: rest
+    visibility: public
+    sourceUrl: "http://CMP:9091/cmdb/vdi_pool"
+    realTime: true
+    ignoreSSLErrors: true
+    sourceMethod: GET
+    translationScript: |
+      if(input.user){
+      for(var x = 0; x < data.length; x++){
+      results.push({"name": data[x].properties.alias, "value": data[x].properties.alias + ";" + data[x].vdi_pool_name });}}
+    requestScript: |
+      if(! input.user){results.push({"name": 'WRAP_No_Load', "value": 'true'});}
+      else{results.push({"name":'WRAP_accountId', "value": input.user.accountId});}
+
+  - name: (prefix)vdiOsList
+    description: VDI OS List
+    type: rest
+    visibility: public
+    sourceUrl: "http://CMP:9091/cmdb/vm_image"
+    realTime: true
+    ignoreSSLErrors: true
+    sourceMethod: GET
+    translationScript: |
+      for(var x = 0; x < data.length; x++){
+      if(data[x].properties.operating_system && data[x].properties.alias!="MorpheusVdiGateway"){
+      results.push({"name": data[x].properties.operating_system['name'] + " " + data[x].properties.operating_system['version'], "value": data[x].id + ";" + data[x].name + ";" + data[x].properties.operating_system['name'] + ";" + data[x].properties.operating_system['version']})
+      }}
+    requestScript: "results.push({'name':'ssr_definition_reference_list', 'value': '{{ rl_cmp_ssr_manage_ssr_definition }}' });"
+
+  - name: (prefix)vdisInPoolList
+    description: VDIs in Pool List
+    type: rest
+    visibility: public
+    sourceUrl: "http://CMP:9091/cmdb/morpheus_vdi"
+    realTime: true
+    ignoreSSLErrors: true
+    sourceMethod: GET
+    translationScript: |
+      if(input.vdiPoolName){
+      for(var x = 0; x < data.length; x++){
+      if(data[x].properties.vdi_pool_reference == input.vdiPoolName.split(';')[1]){
+      results.push({"name": data[x].properties.alias, "value": data[x].properties.alias });}}}
+    requestScript: |
+      if(input.user){
+      results.push({"name":'WRAP_accountId', "value": input.user.accountId});}
+      else{results.push({"name": 'WRAP_No_Load', "value": 'true'});}
+
+  - name: (prefix)vdiPoolMaxSize
+    description: Max Size
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "maxPoolSize", "value": 50}]'
+    translationScript: |
+      if(input.vdiPoolSize){
+      for(var x = 0; x < data.length; x++){
+      if(input.vdiPoolSize == "Custom"){
+      for(var y = 2; y <= parseInt(data[x].value); y++){
+      if(y <= 25){results.push({ "name": y.toString(), "value": y });}
+      else if((y > 25) && (y%10 === 0)){results.push({ "name": y.toString(), "value": y });}}}
+      else if(input.vdiPoolSize == "Small"){results.push({ "name": "10", "value": 10 });}
+      else if(input.vdiPoolSize == "Medium"){results.push({ "name": "25", "value": 25 });}
+      else if(input.vdiPoolSize == "Large"){results.push({ "name": "50", "value": 50 });}}}
+
+  - name: (prefix)vdiInitialPoolSize
+    description: Initial Pool Size
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "initPoolSize", "value": 1}]'  # start from 1 do not allow 0 value
+    translationScript: |
+      if (input.vdiPoolMaxSize != null){
+      for (var x = 0; x < data.length; x++){
+      if(input.vdiPoolSize == "Custom"){
+      for (var y = parseInt(data[x].value); y <= parseInt(input.vdiPoolMaxSize); y++){
+      if (y <= 25){results.push({ "name": y.toString(), "value": y });}
+      else if ((y > 25) && (y%10 === 0)){results.push({ "name": y.toString(), "value": y });}}}
+      else if(input.vdiPoolSize == "Small"){results.push({ "name": "1", "value": 1 });}
+      else if(input.vdiPoolSize == "Medium"){results.push({ "name": "5", "value": 5 });}
+      else if(input.vdiPoolSize == "Large"){results.push({ "name": "10", "value": 10 });}}}
+
+  - name: (prefix)vdiPoolMinIdle
+    description: Min Idle
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "minPoolIdle", "value": 25}]'
+    translationScript: |
+      if(input.vdiPoolMaxSize != null){
+      for(var x = 0; x < data.length; x++){
+      if(input.vdiPoolSize == "Custom"){
+      for(var y = 0; (y < parseInt(input.vdiPoolMaxSize)) && (y <= parseInt(data[x].value)); y++){
+      if(y <= 25){results.push({ "name": y.toString(), "value": y });}
+      else if((y > 25) && (y%10 === 0)){results.push({ "name": y.toString(), "value": y });}}}
+      else if(input.vdiPoolSize == "Small"){results.push({ "name": "1", "value": 1 });}
+      else if(input.vdiPoolSize == "Medium"){results.push({ "name": "2", "value": 2 });}
+      else if(input.vdiPoolSize == "Large"){results.push({ "name": "5", "value": 5 });}}}
+
+  - name: (prefix)vdiPoolMaxIdle
+    description: Max Idle
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "maxPoolIdle", "value": 50}]'
+    translationScript: |
+      if((input.vdiPoolMaxSize != null) && (input.vdiPoolMinIdle != null)){
+      for(var x = 0; x < data.length; x++){
+      if (input.vdiPoolSize == "Custom"){
+      for(var y = (parseInt(input.vdiPoolMinIdle) +1); (y <= parseInt(input.vdiPoolMaxSize)) && (y <= parseInt(data[x].value)); y++){
+      if(y <= 25){results.push({ "name": y.toString(), "value": y });}
+      else if((y > 25) && (y%10 === 0)){results.push({ "name": y.toString(), "value": y });}}}
+      else if(input.vdiPoolSize == "Small"){results.push({ "name": "2", "value": 2 });}
+      else if(input.vdiPoolSize == "Medium"){results.push({ "name": "8", "value": 8 });}
+      else if(input.vdiPoolSize == "Large"){results.push({ "name": "10", "value": 10 });}}}
+
+  - name: (prefix)vdiPoolLeaseTimeout
+    description: Lease Timeout
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "leaseTimeOut", "value": 180}]'
+    translationScript: |
+      for(var x = 0; x < data.length; x++){
+      for(var y = 0; y <= parseInt(data[x].value); y++){
+      if((y <= 60) && (y%15 === 0)){results.push({ "name": y.toString(), "value": y });}
+      else if((y > 60) && (y%60 === 0)){results.push({ "name": y.toString(), "value": y });}}}
+
+  - name: (prefix)updateCurrentVdiPoolValuesList
+    description: Current VDI Pool Values
+    type: rest
+    visibility: public
+    sourceUrl: "http://CMP:9091/morpheus/vdipool"
+    realTime: true
+    ignoreSSLErrors: true
+    sourceMethod: GET
+    translationScript: |
+      if((input.vdiPoolName) && (data['vdiPools'])){
+      a = data['vdiPools']
+      for(var x = 0; x < a.length; x++){
+      results.push({"name": a[x].description, "value": a[x].name + ";" + a[x].description + ";" + a[x].maxPoolSize + ";" + a[x].initialPoolSize + ";" + a[x].minIdle + ";" + a[x].maxIdle + ";" + a[x].allocationTimeoutMinutes })}}
+      if(!input.vdiPoolName){results.push({"name": 'Loading...', "value": 'Loading...' })}
+    requestScript: |
+      if(input.user && input.vdiPoolName){
+      results.push({"name": "WRAP_accountId", "value": input.user.accountId})
+      results.push({"name": "WRAP_vdipool", "value": input.vdiPoolName.split(';')[0]})}
+      else{
+      results.push({"name": 'WRAP_No_Load', "value": 'true'})
+      results.push({"name": 'WRAP_accountId', "value": 0})
+      results.push({"name": 'WRAP_vdipool', "value": ""})}
+
+  - name: (prefix)updateVdiPoolSizeList
+    description: Update VDI Pool Size
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "Small", "value": "10;1;1;2"}, {"name": "Medium", "value": "25;5;2;8"}, {"name": "Large", "value": "50;10;5;10"}]'
+    translationScript: |
+      if(input.currentVdiPoolValues){
+      var current = (input.currentVdiPoolValues.split(";").map(Number)).slice(2,6)
+      var timeOut = (input.currentVdiPoolValues.split(";").map(Number)).slice(6)
+      var values = []
+      function compare_size(a,b){
+          if(a.length !== b.length){return false}
+          else{ for(var i = 0; i < a.length; i++){
+              if(a[i] !== b[i]){return false}}
+              return true}}
+      function get_current(values){return values.name.includes("Current")}
+      for(var x = 0; x < data.length; x++){
+          if(compare_size(current,data[x].value.split(";").map(Number))){
+              values.push({"name": data[x].name + " Current", "value": data[x].name + " Current;" + (data[x].value).split(";").map(Number) + ";" + timeOut})}
+          else{values.push({"name": data[x].name, "value": data[x].name + ";" + (data[x].value).split(";").map(Number)})}}
+      if(values.findIndex(get_current) === -1){
+          values.push({"name": "Custom Current", "value": "Custom Current;" + current + ";" + timeOut})}
+      else{values.push({"name": "Custom", "value": "Custom;" + current + ";" + timeOut})}
+      var res = values.findIndex(get_current)
+      for(var y = res; y < values.length; y++){
+          results.push({"name": values[y].name, "value":  values[y].value})}}
+
+  - name: (prefix)updateVdiPoolMaxSizeList
+    description: Max Size
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "maxPoolSize", "value": 50}]'
+    translationScript: |
+      if(input.updateVdiPoolSize){
+        var n = input.updateVdiPoolSize.split(";")[0]
+        var v = parseInt((input.updateVdiPoolSize.split(";")[1]).split(",")[0])
+        if(n.includes("Custom")){
+          for(var y = v; y <= parseInt(data[0].value); y++){
+            if(y <= 25){
+              if(y === v){results.push({ "name": y.toString() + " Current", "value": y })}
+              else{results.push({ "name": y.toString(), "value": y })}}
+            else if((y > 25) && (y%10 === 0)){
+              if(y === v){results.push({ "name": y.toString() + " Current", "value": y })}
+              else{results.push({ "name": y.toString(), "value": y })}}}}
+        else if(n.includes("Small")){
+          if(v === 10){results.push({"name": "10 Current", "value": 10})}
+          else{results.push({"name": "10", "value": 10});}}
+        else if(n.includes("Medium")){
+          if(v === 25){results.push({"name": "25 Current", "value": 25})}
+          else{results.push({"name": "25", "value": 25});}}
+        else if(n.includes("Large")){
+          if(v === 50){results.push({"name": "50 Current", "value": 50})}
+          else{results.push({"name": "50", "value": 50});}}}
+
+  - name: (prefix)updateVdiInitialPoolSizeList
+    description: Initial Pool Size
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "initPoolSize", "value": 1}]'
+    translationScript: |
+      if ((input.updateVdiPoolMaxSize != null)&& (input.updateVdiPoolSize != null)){
+      var n = input.updateVdiPoolSize.split(";")[0]
+      var v = parseInt((input.updateVdiPoolSize.split(";")[1]).split(",")[1])
+      if(n.includes("Custom")){
+          for(var y = v; y <= (parseInt(input.updateVdiPoolMaxSize)); y++){
+              if (y <= 25){
+                  if(y === v){results.push({ "name": y.toString() + " Current", "value": y })}
+                  else{results.push({ "name": y.toString(), "value": y })}}
+              else if ((y > 25) && (y%10 === 0)){
+                  if(y === v){results.push({ "name": y.toString() + " Current", "value": y })}
+                  else{results.push({ "name": y.toString(), "value": y })}}}}
+      else if(n.includes("Small")){
+          if(v === 1){results.push({ "name": "1 Current", "value": 1 })}
+          else{results.push({ "name": "1", "value": 1 })}}
+      else if(n.includes("Medium")){
+          if(v === 5){results.push({ "name": "5 Current", "value": 5 })}
+          else{results.push({ "name": "5", "value": 5 })}}
+      else if(n.includes("Large")){
+          if(v === 10){results.push({ "name": "10 Current", "value": 10 })}
+          else{results.push({ "name": "10", "value": 10 })}}}
+
+  - name: (prefix)updateVdiPoolMinIdleList
+    description: Min Idle
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "minPoolIdle", "value": 25}]'
+    translationScript: |
+      if((input.updateVdiPoolMaxSize != null) && (input.updateVdiPoolSize != null)){
+          var n = input.updateVdiPoolSize.split(";")[0]
+          var v = parseInt((input.updateVdiPoolSize.split(";")[1]).split(",")[2])
+          if(n.includes("Custom")){
+              for(var y = v; (y <= (parseInt(input.updateVdiPoolMaxSize) -1) && (y <= parseInt(data[0].value))); y++){
+                  if (y <= 25){
+                      if(y === v){results.push({ "name": y.toString() + " Current", "value": y })}
+                      else{results.push({ "name": y.toString(), "value": y })}}
+                  else if ((y > 25) && (y%10 === 0)){
+                      if(y === v){results.push({ "name": y.toString() + " Current", "value": y })}
+                      else{results.push({ "name": y.toString(), "value": y })}}}}
+          else if(n.includes("Small")){
+              if(v === 1){results.push({ "name": "1 Current", "value": 1 })}
+              else{results.push({ "name": "1", "value": 1 })}}
+          else if(n.includes("Medium")){
+              if(v === 5){results.push({ "name": "5 Current", "value": 5 })}
+              else{results.push({ "name": "5", "value": 5 })}}
+          else if(n.includes("Large")){
+              if(v === 10){results.push({ "name": "10 Current", "value": 10 })}
+              else{results.push({ "name": "10", "value": 10 })}}}
+
+  - name: (prefix)updateVdiPoolMaxIdleList
+    description: Max Idle
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "maxPoolIdle", "value": 50}]'
+    translationScript: |
+      if(input.updateVdiPoolMaxSize && input.updateVdiPoolMinIdle && input.updateVdiPoolSize){
+      var n = input.updateVdiPoolSize.split(";")[0]
+      var v = parseInt((input.updateVdiPoolSize.split(";")[1]).split(",")[3])
+      if(n.includes("Custom")){
+          for(var y = (parseInt(input.updateVdiPoolMinIdle) +1); (y <= parseInt(input.updateVdiPoolMaxSize) && (y <= parseInt(data[0].value))); y++){
+              if(y <= 25){
+                  if(y === v){results.push({ "name": y.toString() + " Current", "value": y })}
+                  else{results.push({ "name": y.toString(), "value": y })}}
+              else if((y > 25) && (y%10 === 0)){
+                  if(y === v){results.push({ "name": y.toString() + " Current", "value": y })}
+                  else{results.push({ "name": y.toString(), "value": y })}}}}
+      else if(n.includes("Small")){
+          if(v === 2 ){results.push({ "name": "2 Current", "value": 2 })}
+          else{results.push({ "name": "2", "value": 2 })}}
+      else if(n.includes("Medium")){
+          if(v === 8){results.push({ "name": "8 Current", "value": 8 })}
+          else{results.push({ "name": "8", "value": 8 })}}
+      else if(n.includes("Large")){
+          if(v === 10){results.push({ "name": "10 Current", "value": 10 })}
+          else{results.push({ "name": "10", "value": 10 })}}}
+
+  - name: (prefix)updateVdiPoolLeaseTimeoutList
+    description: Lease Timeout
+    type: manual
+    visibility: public
+    realTime: true
+    initialDataset: '[{"name": "leaseTimeOut", "value": 180}]'
+    translationScript: |
+      if(input.updateVdiPoolSize != null){
+      var v = parseInt((input.updateVdiPoolSize.split(";")[2]))
+      for(var x = 0; x < data.length; x++){
+          for(var y = 0; y <= parseInt(data[x].value); y++){
+          if((y <= 60) && (y%15 === 0)){
+              if(y === v){results.push({ "name": y.toString() + " Current", "value": y })}
+              else{results.push({ "name": y.toString(), "value": y })}}
+          else if((y > 60) && (y%60 === 0)){
+              if(y === v){results.push({ "name": y.toString() + " Current", "value": y })}
+              else{results.push({ "name": y.toString(), "value": y })}}}}}
