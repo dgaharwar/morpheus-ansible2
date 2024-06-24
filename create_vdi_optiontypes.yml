@@ -1,0 +1,394 @@
+---
+pb_cmp_ssr_optiontype_input:
+  - name: (prefix)actionVdiPool
+    description: Action list to Create or Delete a VDI Pool
+    fieldName: actionVdiPool
+    code: actionVdiPool
+    fieldLabel: Action
+    helpBlock: Select the action to be performed.
+    required: true
+    showOnCreate: true
+    showOnEdit: false
+    optionList:
+      id: (prefix)actionListCD
+    type: select
+
+  - name: (prefix)newVdiPoolName
+    description: VDI Pool Name
+    fieldLabel: Pool Name
+    fieldName: newVdiPoolName
+    code: newVdiPoolName
+    type: text
+    placeHolder: Enter a name for the new VDI Pool
+    helpBlock: Unique VDI Pool Name, has to be unique inside of your Tenant. It can not be empty, must be between 4 and 11 characters (digits or upper/lower case characters). It cannot start or end with a dash or start with a number.
+    visibleOnCode: actionVdiPool:(Create)
+    dependsOnCode: actionVdiPool,newVdiPoolName
+    requireOnCode: actionVdiPool:(Create)
+    verifyPattern: "^(?![0-9])(?!-)[a-zA-Z0-9-]{4,11}(?<!-)$"
+    showOnEdit: true
+    editable: true
+    displayValueOnDetails: true
+    exportMeta: true
+
+  - name: (prefix)vdiPoolName
+    description: Select the VDI Pool.
+    fieldName: vdiPoolName
+    code: vdiPoolName
+    fieldLabel: Pool Name
+    helpBlock: Select the VDI Pool.
+    optionSource: list
+    optionList:
+      id: (prefix)vdiPoolList
+    type: select
+    visibleOnCode: actionVdiPool:(Update|Delete)
+    dependsOnCode: actionVdiPool
+    requireOnCode: actionVdiPool:(Update|Delete)
+    showOnEdit: true
+    editable: true
+    exportMeta: true
+
+  - name: (prefix)vdisInPoolList
+    description: List of VDIs in Pool
+    fieldName: VDIsInPool
+    code: VDIsInPool
+    fieldLabel: VDIs remaining in Pool
+    helpBlock: You have the following VDI's remaining in the Pool.
+    optionSource: list
+    optionList:
+      id: (prefix)vdisInPoolList
+    type: select
+    visibleOnCode: actionVdiPool:(Delete)
+    dependsOnCode: vdiPoolName
+    showOnEdit: true
+    editable: true
+    exportMeta: true
+
+  - name: (prefix)vdiPoolDeleteConfirmation
+    description: Are you sure you want this VDI pool to be deleted?
+    fieldLabel: Delete confirmation
+    fieldName: deleteVdiPoolConfirmation
+    code: deleteVdiPoolConfirmation
+    type: text
+    placeHolder: Type "Delete" to confirm deletion
+    helpBlock: Type "Delete" to confirm deletion.
+    visibleOnCode: actionVdiPool:(Delete)
+    dependsOnCode: actionVdiPool,vdiPoolName,VDIsInPool
+    requireOnCode: actionVdiPool:(Delete)
+    verifyPattern: "^Delete|$"
+    showOnEdit: true
+    editable: true
+    displayValueOnDetails: true
+    exportMeta: true
+
+  - name: (prefix)vdiPoolDescription
+    description: Description
+    fieldLabel: Description
+    fieldName: vdiPoolDescription
+    code: vdiPoolDescription
+    type: text
+    placeHolder: Description of the VDI Pool
+    helpBlock: Description of the VDI Pool.
+    visibleOnCode: actionVdiPool:(Create)
+    dependsOnCode: actionVdiPool
+    requireOnCode: actionVdiPool:(Create)
+    exportMeta: true
+
+  - name: (prefix)updateVdiPoolDescription
+    description: Description
+    fieldLabel: Description
+    fieldName: updateVdiPoolDescription
+    code: updateVdiPoolDescription
+    type: text
+    placeHolder: New Description of the VDI Pool
+    helpBlock: New Description of the VDI Pool.
+    visibleOnCode: actionVdiPool:(Update)
+    dependsOnCode: actionVdiPool
+    exportMeta: true
+
+  - name: (prefix)vdiSelectedCloud
+    description: Morpheus Cloud that this VDI will be part of.
+    fieldName: vdiSelectedCloud
+    code: vdiSelectedCloud
+    fieldLabel: Cloud
+    helpBlock: Select the cloud where the VDI Pool will be created.
+    visibleOnCode: actionVdiPool:(Create)
+    dependsOnCode: actionVdiPool
+    requireOnCode: actionVdiPool:(Create)
+    displayValueOnDetails: false
+    showOnCreate: false
+    showOnEdit: false
+    required: true
+    optionList:
+      id: (prefix)vdiCloudsList
+    type: select
+    exportMeta: true
+
+  - name: (prefix)vdiSelectedGroup
+    description: Group
+    fieldName: vdiSelectedGroup
+    code: vdiSelectedGroup
+    fieldLabel: Group
+    helpBlock: Select the group where the VDI Pool will be created.
+    visibleOnCode: actionVdiPool:(Create)
+    dependsOnCode: vdiSelectedCloud
+    requireOnCode: actionVdiPool:(Create)
+    displayValueOnDetails: false
+    showOnCreate: false
+    showOnEdit: false
+    required: true
+    optionList:
+      id: (prefix)vdiGroupsList
+    type: select
+    exportMeta: true
+
+  - name: (prefix)vdiSelectedPlan
+    description: T-Shirt Size of your VDI. Please refer to the Wiki for details.
+    fieldName: vdiSelectedPlan
+    code: vdiSelectedPlan
+    fieldLabel: T-Shirt Size
+    helpBlock: T-Shirt Size of your VDI. Please refer to the Wiki for details.
+    visibleOnCode: actionVdiPool:(Create)
+    requireOnCode: actionVdiPool:(Create)
+    dependsOnCode: vdiSelectedGroup
+    required: true
+    optionList:
+      id: (prefix)vdiPlanList
+    type: select
+    exportMeta: true
+
+  - name: (prefix)vdiPoolOs
+    description: VDI Pool Operating System
+    fieldName: vdiPoolOperatingSystem
+    code: vdiPoolOperatingSystem
+    fieldLabel: Operating System
+    helpBlock: Select the VDI pool Operating System.
+    visibleOnCode: actionVdiPool:(Create)
+    dependsOnCode: actionVdiPool
+    requireOnCode: actionVdiPool:(Create)
+    optionList:
+      id: (prefix)vdiOsList
+    type: select
+    exportMeta: true
+
+  - name: (prefix)vdiPoolSize
+    description: Pool size
+    fieldName: vdiPoolSize
+    code: vdiPoolSize
+    fieldLabel: VDI Pool Size
+    helpBlock: Select the VDI Pool size.
+    visibleOnCode: actionVdiPool:(Create)
+    dependsOnCode: actionVdiPool
+    required: true
+    defaultValue: "Small"
+    realTime: true
+    optionSource: list
+    optionList:
+      id: (prefix)vdiPoolSizeList
+    type: select
+    exportMeta: false
+
+  - name: (prefix)vdiPoolMaxSize
+    description: VDI Pool Max Size
+    fieldName: vdiPoolMaxSize
+    code: vdiPoolMaxSize
+    fieldLabel: Max Size
+    helpBlock: The total number of virtual desktops this pool can have.
+    visibleOnCode: matchAll::actionVdiPool:(Create|Update),vdiPoolSize:(Custom)
+    dependsOnCode: matchAll::actionVdiPool,vdiPoolSize
+    required: true
+    optionList:
+      id: (prefix)vdiPoolMaxSize
+    type: select
+
+  - name: (prefix)vdiPoolInitialPoolSize
+    description: VDI Pool Initial Pool Size
+    fieldName: vdiPoolInitialPoolSize
+    code: vdiPoolInitialPoolSize
+    fieldLabel: Initial Pool Size
+    helpBlock: Number of virtual desktops that will be prepared when the pool is created.
+    visibleOnCode: matchAll::actionVdiPool:(Create|Update),vdiPoolSize:(Custom)
+    dependsOnCode: matchAll::actionVdiPool,vdiPoolSize,vdiPoolMaxSize
+    required: true
+    optionList:
+      id: (prefix)vdiInitialPoolSize
+    type: select
+
+  - name: (prefix)vdiPoolMinIdle
+    description: VDI Pool Min Idle
+    fieldName: vdiPoolMinIdle
+    code: vdiPoolMinIdle
+    fieldLabel: Min Idle
+    helpBlock: The minimum number of virtual desktops that should remain idle and ready.
+    visibleOnCode: matchAll::actionVdiPool:(Create|Update),vdiPoolSize:(Custom)
+    dependsOnCode: matchAll::actionVdiPool,vdiPoolSize,vdiPoolMaxSize
+    required: true
+    optionList:
+      id: (prefix)vdiPoolMinIdle
+    type: select
+
+  - name: (prefix)vdiPoolMaxIdle
+    description: VDI Pool Max Idle
+    fieldName: vdiPoolMaxIdle
+    code: vdiPoolMaxIdle
+    fieldLabel: Max Idle
+    helpBlock: The maximum number of virtual desktops that remain idle and ready.
+    visibleOnCode: matchAll::actionVdiPool:(Create|Update),vdiPoolSize:(Custom)
+    dependsOnCode: matchAll::vdiPoolSize,vdiPoolMinIdle,vdiPoolMaxSize
+    required: true
+    optionList:
+      id: (prefix)vdiPoolMaxIdle
+    type: select
+
+  - name: (prefix)vdiPoolLeaseTimeout
+    description: VDI Pool Lease Timeout
+    fieldName: vdiPoolLeaseTimeout
+    code: vdiPoolLeaseTimeout
+    fieldLabel: Lease Timeout
+    helpBlock:
+      "The user lease time on a virtual desktop they've reserved.
+      The lease will continue to auto-renew itself as long as the user is logged into Morpheus.
+      Once the user has logged out and the lease timeout period has expired, the machine will be released as appropriate based on your configuration"
+    visibleOnCode: actionVdiPool:(Create)
+    dependsOnCode: actionVdiPool
+    defaultValue: "60"
+    required: true
+    optionSource: list
+    optionList:
+      id: (prefix)vdiPoolLeaseTimeout
+    type: select
+
+  - name: (prefix)vdiSsrDefinition
+    description: vdiSsrDefinition
+    fieldLabel: vdiSsrDefinition
+    fieldName: vdiSsrDefinition
+    code: vdiSsrDefinition
+    type: hidden
+    showOnCreate: false
+    showOnEdit: false
+    displayValueOnDetails: false
+    value: "{{ rl_cmp_ssr_manage_ssr_definition }}"
+    defaultValue: "{{ rl_cmp_ssr_manage_ssr_definition }}"
+    exportMeta: false
+
+  - name: (prefix)updateVdiPoolDescription
+    description: New Description
+    fieldLabel: New Description
+    fieldName: updateVdiPoolDescription
+    code: updateVdiPoolDescription
+    type: text
+    placeHolder: New Description of the VDI Pool.
+    helpBlock: New VDI Pool description.
+    visibleOnCode: matchAll::actionVdiPool:(Update)
+    dependsOnCode: matchAll::actionVdiPool
+    requireOnCode: matchAll::actionVdiPool:(Update)
+    required: false
+    exportMeta: false
+
+  - name: (prefix)updateCurrentVdiPoolValues
+    description: Current VDI Pool Values
+    fieldLabel: Current Description
+    fieldName: currentVdiPoolValues
+    code: currentVdiPoolValues
+    helpBlock: "Input used to get the current values for the VDI pool"
+    visibleOnCode: actionVdiPool:(Update)
+    dependsOnCode: matchAll::actionVdiPool,vdiPoolName
+    requireOnCode: actionVdiPool:(Update)
+    showOnCreate: false
+    showOnEdit: false
+    displayValueOnDetails: false
+    required: false
+    optionSource: list
+    optionList:
+      id: (prefix)updateCurrentVdiPoolValuesList
+    type: select
+
+  - name: (prefix)updateVdiPoolSize
+    description: Update VDI Pool Size
+    fieldLabel: VDI Pool Size
+    fieldName: updateVdiPoolSize
+    code: updateVdiPoolSize
+    helpBlock: Select the VDI Pool size.
+    visibleOnCode: matchAll::actionVdiPool:(Update)
+    dependsOnCode: matchAll::actionVdiPool,vdiPoolName,currentVdiPoolValues
+    requireOnCode: actionVdiPool:(Update)
+    showOnCreate: false
+    showOnEdit: false
+    displayValueOnDetails: false
+    required: false
+    optionSource: list
+    optionList:
+      id: (prefix)updateVdiPoolSizeList
+    type: select
+
+  - name: (prefix)updateVdiPoolMaxSize
+    description: Update VDI Pool Max Size
+    fieldName: updateVdiPoolMaxSize
+    code: updateVdiPoolMaxSize
+    fieldLabel: Max Size
+    helpBlock: The total number of virtual desktops this pool can have.
+    visibleOnCode: matchAll::actionVdiPool:(Update)
+    dependsOnCode: matchAll::actionVdiPool,updateVdiPoolSize
+    requireOnCode: actionVdiPool:(Update)
+    required: false
+    optionList:
+      id: (prefix)updateVdiPoolMaxSizeList
+    type: select
+
+  - name: (prefix)updateVdiPoolInitialPoolSize
+    description: VDI Pool Initial Pool Size
+    fieldName: updateVdiPoolInitialPoolSize
+    code: updateVdiPoolInitialPoolSize
+    fieldLabel: Initial Pool Size
+    helpBlock: Number of virtual desktops that will be prepared when the pool is created.
+    visibleOnCode: matchAll::actionVdiPool:(Update)
+    dependsOnCode: matchAll::actionVdiPool,updateVdiPoolSize,updateVdiPoolMaxSize
+    requireOnCode: actionVdiPool:(Update)
+    required: false
+    optionList:
+      id: (prefix)updateVdiInitialPoolSizeList
+    type: select
+
+  - name: (prefix)updateVdiPoolMinIdle
+    description: VDI Pool Min Idle
+    fieldName: updateVdiPoolMinIdle
+    code: updateVdiPoolMinIdle
+    fieldLabel: Min Idle
+    helpBlock: The minimum number of virtual desktops that should remain idle and ready.
+    visibleOnCode: matchAll::actionVdiPool:(Update)
+    dependsOnCode: matchAll::actionVdiPool,updateVdiPoolSize,updateVdiPoolMaxSize
+    requireOnCode: actionVdiPool:(Update)
+    required: false
+    optionList:
+      id: (prefix)updateVdiPoolMinIdleList
+    type: select
+
+  - name: (prefix)updateVdiPoolMaxIdle
+    description: VDI Pool Max Idle
+    fieldName: updateVdiPoolMaxIdle
+    code: updateVdiPoolMaxIdle
+    fieldLabel: Max Idle
+    helpBlock: The maximum number of virtual desktops that remain idle and ready.
+    visibleOnCode: matchAll::actionVdiPool:(Update)
+    dependsOnCode: matchAll::actionVdiPool,updateVdiPoolSize,updateVdiPoolMinIdle,updateVdiPoolMaxSize
+    requireOnCode: actionVdiPool:(Update)
+    required: false
+    optionList:
+      id: (prefix)updateVdiPoolMaxIdleList
+    type: select
+
+  - name: (prefix)updateVdiPoolLeaseTimeout
+    description: VDI Pool Lease Timeout
+    fieldName: updateVdiPoolLeaseTimeout
+    code: updateVdiPoolLeaseTimeout
+    fieldLabel: Lease Timeout
+    helpBlock:
+      "The user lease time on a virtual desktop they've reserved.
+      The lease will continue to auto-renew itself as long as the user is logged into Morpheus.
+      Once the user has logged out and the lease timeout period has expired, the machine will be released as appropriate based on your configuration"
+    visibleOnCode: matchAll::actionVdiPool:(Update)
+    dependsOnCode: matchAll::actionVdiPool,updateVdiPoolSize
+    required: false
+    optionSource: list
+    optionList:
+      id: (prefix)updateVdiPoolLeaseTimeoutList
+    type: select
