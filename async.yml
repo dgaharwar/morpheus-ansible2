@@ -2,9 +2,7 @@
 - name: Test async with Morpheus Ansible
   hosts: all
   gather_facts: false
-
   tasks:
-
     - name: Long running task
       ansible.builtin.shell:
         cmd: sleep 60
