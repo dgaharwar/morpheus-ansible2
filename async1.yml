@@ -7,4 +7,4 @@
       ansible.builtin.shell:
         cmd: sleep 60
       async: 120
-      poll: 3
+      poll: 0
