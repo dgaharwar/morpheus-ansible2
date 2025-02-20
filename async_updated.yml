@@ -7,5 +7,5 @@
     - name: Test Ansible Async
       ansible.builtin.command: sleep 10
       async: 20
-      poll: 10  # Wait for 10 seconds before checking the status
+      poll: 15  # Wait for 10 seconds before checking the status
       register: test_task
