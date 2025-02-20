@@ -1,5 +1,11 @@
-- name: Test Ansible Async
-  ansible.builtin.command: sleep 10
-  async: 20
-  poll: 0
-  register: test_task
+- name: Test async with Morpheus Ansible
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  gather_facts: false
+  tasks:
+    - name: Test Ansible Async
+      ansible.builtin.command: sleep 10
+      async: 20
+      poll: 0
+      register: test_task
