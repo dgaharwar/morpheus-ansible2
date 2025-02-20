@@ -1,0 +1,23 @@
+---
+- name: Test async with Morpheus Ansible
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Start long-running task
+      ansible.builtin.shell:
+        cmd: sleep 60
+      async: 120
+      poll: 0
+      register: long_task
+
+    - name: Wait for task to complete
+      ansible.builtin.async_status:
+        jid: "{{ long_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 40
+      delay: 3
+
+    - name: Notify completion
+      ansible.builtin.debug:
+        msg: "The long-running task has completed successfully!"
