@@ -1,11 +1,11 @@
 - name: Test async with Morpheus Ansible
   hosts: all
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
+#  vars:
+#    ansible_python_interpreter: /usr/bin/python3
   gather_facts: false
   tasks:
     - name: Test Ansible Async
       ansible.builtin.command: sleep 10
       async: 20
-      poll: 15  # Wait for 10 seconds before checking the status
+      poll: 30  # Wait for 10 seconds before checking the status
       register: test_task
