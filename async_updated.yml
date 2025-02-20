@@ -1,34 +1,5 @@
----
-- name: Test async with Morpheus Ansible
-  hosts: all
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
-  gather_facts: false
-  tasks:
-    - name: Start long-running task asynchronously
-      ansible.builtin.command: sleep 60
-      async: 120
-      poll: 0
-      register: long_task
-      changed_when: false
-
-    - name: Debug async task output
-      ansible.builtin.debug:
-        msg: "long_task output: {{ long_task }}"
-
-    - name: Ensure job ID is available
-      ansible.builtin.fail:
-        msg: "Job ID not found! Async task might have failed."
-      when: long_task.ansible_job_id is not defined
-
-    - name: Wait for task to complete
-      ansible.builtin.async_status:
-        jid: "{{ long_task.ansible_job_id }}"
-      register: job_result
-      until: job_result.finished
-      retries: 40
-      delay: 3
-
-    - name: Notify completion
-      ansible.builtin.debug:
-        msg: "The long-running task has completed successfully!"
+- name: Test Ansible Async
+  ansible.builtin.command: sleep 10
+  async: 20
+  poll: 0
+  register: test_task
