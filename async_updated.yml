@@ -9,7 +9,13 @@
       async: 120
       poll: 0
       register: long_task
-
+    - name: Debug async task output
+      ansible.builtin.debug:
+        var: long_task
+    - name: Ensure job ID is available
+      ansible.builtin.fail:
+        msg: "Job ID not found! Async task might have failed."
+      when: long_task.ansible_job_id is not defined
     - name: Wait for task to complete
       ansible.builtin.async_status:
         jid: "{{ long_task.ansible_job_id }}"
@@ -17,7 +23,6 @@
       until: job_result.finished
       retries: 40
       delay: 3
-
     - name: Notify completion
       ansible.builtin.debug:
         msg: "The long-running task has completed successfully!"
