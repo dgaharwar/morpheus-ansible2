@@ -6,7 +6,7 @@
   gather_facts: false
   tasks:
     - name: Start long-running task asynchronously
-      ansible.builtin.command: sleep 60
+      ansible.builtin.shell: "nohup sleep 60 > /tmp/sleep_output.log 2>&1 & echo $!"
       async: 120
       poll: 0
       register: long_task
