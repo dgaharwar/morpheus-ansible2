@@ -7,5 +7,5 @@
     - name: Test Ansible Async
       ansible.builtin.command: sleep 10
       async: 20
-      poll: 0
+      poll: 2
       register: test_task
