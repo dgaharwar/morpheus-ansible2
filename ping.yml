@@ -1,0 +1,40 @@
+---
+- name: Server patch
+  hosts: all
+  become: yes
+  ignore_errors: true
+
+  tasks:
+    - name: Upgrade all packages - RedHat family
+      ansible.builtin.dnf:
+        name: '*'
+        state: latest
+      when: ansible_os_family == "RedHat"
+
+    - name: Remove locks on SLES
+      shell: >
+        while [[ $(zypper locks | grep any | wc -l) -gt 0 ]]; do
+          zypper rl 1;
+        done
+      when: ansible_os_family == "Suse"
+
+    - name: Upgrade all packages - Suse family
+      community.general.zypper:
+        name: '*'
+        state: latest
+      register: result
+      until: result.rc == 0
+      retries: 4
+      delay: 10
+      when: ansible_os_family == "Suse"
+
+    - name: Run "apt-get update" as a separate step
+      ansible.builtin.apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Upgrade all packages - Debian family
+      ansible.builtin.apt:
+        name: '*'
+        state: latest
+      when: ansible_os_family == "Debian"
